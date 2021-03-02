@@ -21,7 +21,8 @@
                 "src/nist5.c",
                 "src/quark.c",
                 "src/qubit.c",
-                "src/scryptjane.c",
+                # VeriBlock: build errors
+#                 "src/scryptjane.c",
                 "src/scryptn.c",
                 "src/sha1.c",
                 "src/sha256d.c",
