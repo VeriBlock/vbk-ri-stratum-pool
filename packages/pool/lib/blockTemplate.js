@@ -3,13 +3,23 @@ var bignum = require('bignum');
 var merkleTree = require('./merkleTree.js');
 var transactions = require('./transactions.js');
 var util = require('./util.js');
+var pop = require('./pop')
 
 
 /**
  * The BlockTemplate class holds a single job.
  * and provides several methods to validate and submit it to the daemon coin
 **/
-var BlockTemplate = module.exports = function BlockTemplate(jobId, rpcData, poolAddressScript, extraNoncePlaceholder, reward, txMessages, recipients){
+var BlockTemplate = module.exports = function BlockTemplate(
+  jobId,
+  rpcData,
+  poolAddressScript,
+  extraNoncePlaceholder,
+  reward,
+  txMessages,
+  recipients,
+  popParameters = undefined
+  ){
 
     //private members
 
@@ -55,23 +65,53 @@ var BlockTemplate = module.exports = function BlockTemplate(jobId, rpcData, pool
 
     this.difficulty = parseFloat((diff1 / this.target.toNumber()).toFixed(9));
 
-
-
-
-
     this.prevHashReversed = util.reverseByteOrder(new Buffer(rpcData.previousblockhash, 'hex')).toString('hex');
     this.transactionData = Buffer.concat(rpcData.transactions.map(function(tx){
         return new Buffer(tx.data, 'hex');
     }));
     this.merkleTree = new merkleTree(getTransactionBuffers(rpcData.transactions));
     this.merkleBranch = getMerkleHashes(this.merkleTree.steps);
+
+    // POP-related code:
+    _this = this
+    this.popSupported = false
+    this.popActivated = false
+    this.hasPopBit = false
+    do {
+      // adding do..while to add early break when necessary (for clean code)
+      this.popSupported = !!(popParameters && popParameters.popSupported)
+      if(!this.popSupported) {
+        break
+      }
+
+      // VeriBlock: get pop-related fields
+      if(!pop.parsePopFields(this, rpcData)) {
+        this.popActivated = false
+        break
+      }
+
+      this.hasPopBit = !!(this.version & pop.POP_BIT);
+      this.popActivated = popParameters.isPopActive(this.height)
+      if(!this.popActivated) {
+        break
+      }
+
+      // add two new merkle branches.
+      this.merkleTree.steps.push(this.popDataRoot)
+      this.merkleTree.steps.push(this.popContextInfoHash)
+      this.merkleBranch.push(this.popDataRoot.toString('hex'))
+      this.merkleBranch.push(this.popContextInfoHash.toString('hex'))
+    } while(false);
+
     this.generationTransaction = transactions.CreateGeneration(
         rpcData,
         poolAddressScript,
         extraNoncePlaceholder,
         reward,
         txMessages,
-        recipients
+        recipients,
+      (_this.popSupported && _this.popActivated) ?
+            this.popRewards : undefined
     );
 
     this.serializeCoinbase = function(extraNonce1, extraNonce2){
@@ -100,18 +140,25 @@ var BlockTemplate = module.exports = function BlockTemplate(jobId, rpcData, pool
     };
 
     this.serializeBlock = function(header, coinbase){
-        return Buffer.concat([
+        var list = [
             header,
 
             util.varIntBuffer(this.rpcData.transactions.length + 1),
             coinbase,
             this.transactionData,
 
-            getVoteData(),
+            // getVoteData(),
+            //
+            // //POS coins require a zero byte appended to block which the daemon replaces with the signature
+            // new Buffer(reward === 'POS' ? [0] : [])
+        ]
 
-            //POS coins require a zero byte appended to block which the daemon replaces with the signature
-            new Buffer(reward === 'POS' ? [0] : [])
-        ]);
+        if(_this.hasPopBit) {
+            var encoded = pop.encodePopData(_this.popData)
+            list.push(encoded)
+        }
+
+        return Buffer.concat(list);
     };
 
     this.registerSubmit = function(extraNonce1, extraNonce2, nTime, nonce){

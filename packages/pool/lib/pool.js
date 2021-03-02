@@ -48,6 +48,7 @@ var pool = module.exports = function pool(options, authorizeFn){
                         SetupPeer();
                         StartStratumServer(function(){
                             OutputPoolInfo();
+                            GetPopParams()
                             _this.emit('started');
                         });
                     });
@@ -151,19 +152,12 @@ var pool = module.exports = function pool(options, authorizeFn){
                 var blockCount = results.sort(function (a, b) {
                     return b.response.blocks - a.response.blocks;
                 })[0].response.blocks;
+                var headerCount = results.sort(function (a, b) {
+                    return b.response.headers - a.response.headers;
+                })[0].response.headers;
 
-                //get list of peers and their highest block height to compare to ours
-                _this.daemon.cmd('getpeerinfo', [], function(results){
-
-                    var peers = results[0].response;
-                    var totalBlocks = peers.sort(function(a, b){
-                        return b.startingheight - a.startingheight;
-                    })[0].startingheight;
-
-                    var percent = (blockCount / totalBlocks * 100).toFixed(2);
-                    emitWarningLog('Downloaded ' + percent + '% of blockchain from ' + peers.length + ' peers');
-                });
-
+                var percent = (blockCount / headerCount * 100).toFixed(2);
+                emitWarningLog('Downloaded ' + percent + '% (' + blockCount + '/' + headerCount + ') of blockchain');
             });
         };
 
@@ -461,17 +455,18 @@ var pool = module.exports = function pool(options, authorizeFn){
 
 
 
-    function StartStratumServer(finishedCallback){
+    function StartStratumServer(finishedCallback) {
         _this.stratumServer = new stratum.Server(options, authorizeFn);
 
         _this.stratumServer.on('started', function(){
+            GetPopParams()
             options.initStats.stratumPorts = Object.keys(options.ports);
             _this.stratumServer.broadcastMiningJobs(_this.jobManager.currentJob.getJobParams());
             finishedCallback();
 
         }).on('broadcastTimeout', function(){
             emitLog('No new blocks for ' + options.jobRebroadcastTimeout + ' seconds - updating transactions & rebroadcasting work');
-
+            GetPopParams()
             GetBlockTemplate(function(error, rpcData, processedBlock){
                 if (error || processedBlock) return;
                 _this.jobManager.updateCurrentJob(rpcData);
@@ -573,9 +568,37 @@ var pool = module.exports = function pool(options, authorizeFn){
         }, pollingInterval);
     }
 
+    function GetPopParams(){
+        callback = function(response){
+            _this.jobManager.popParams = response
+            p = _this.jobManager.popParams
+            if (p.popSupported) {
+                p.isPopActive = function(height){
+                    return height >= p.popBootstrapHeight && height >= p.popActivationHeight
+                }
+            }
+        }
 
+        _this.daemon.cmd('getpopparams',
+          [],
+          function(result){
+              if (result.error){
+                  callback({
+                      popSupported: false
+                  })
+              } else {
+                  callback({
+                      popSupported: true,
+                      popBootstrapHeight: result.response.bootstrapBlock.height,
+                      popActivationHeight: result.response.popActivationHeight
+                  });
+              }
+          }, true
+        );
+    }
 
     function GetBlockTemplate(callback){
+        GetPopParams()
         _this.daemon.cmd('getblocktemplate',
             [{"capabilities": [ "coinbasetxn", "workid", "coinbase/append" ], "rules": [ "segwit" ]}],
             function(result){

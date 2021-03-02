@@ -156,13 +156,14 @@ var StratumClient = function(options){
             considerBan(false);
             return;
         }
+        console.log(message)
         _this.emit('submit',
             {
                 name        : message.params[0],
                 jobId       : message.params[1],
                 extraNonce2 : message.params[2],
-                nTime       : message.params[3],
-                nonce       : message.params[4]
+                nTime       : message.params[3].toLowerCase(),
+                nonce       : message.params[4].toLowerCase()
             },
             function(error, result){
                 if (!considerBan(result)){

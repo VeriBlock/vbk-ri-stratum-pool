@@ -4,7 +4,6 @@
     "version": "0.1.0",
     "description": "An extremely efficient, highly scalable, all-in-one, easy to setup cryptocurrency mining pool",
     "scripts": {
-        "build": "echo ok"
     },
     "keywords": [
         "stratum",
@@ -36,7 +35,7 @@
         "directory": "packages/portal"
     },
     "dependencies": {
-        "@veriblock/pop-stratum-pool": "*",
+        "@veriblock/pop-stratum-pool": "0.1.0",
         "dateformat": "1.0.12",
         "node-json-minify": "*",
         "redis": "0.12.1",
