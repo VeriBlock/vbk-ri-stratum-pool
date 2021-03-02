@@ -1,7 +1,11 @@
 {
-    "name": "node-open-mining-portal",
-    "version": "0.0.4",
+    "name": "@veriblock/pop-stratum-portal",
+	"private": true,
+    "version": "0.1.0",
     "description": "An extremely efficient, highly scalable, all-in-one, easy to setup cryptocurrency mining pool",
+    "scripts": {
+        "build": "echo ok"
+    },
     "keywords": [
         "stratum",
         "mining",
@@ -12,9 +16,9 @@
         "litecoin",
         "scrypt"
     ],
-    "homepage": "https://github.com/zone117x/node-open-mining-portal",
+    "homepage": "https://github.com/VeriBlock/vbk-ri-stratum-pool.git",
     "bugs": {
-        "url": "https://github.com/zone117x/node-open-mining-portal/issues"
+        "url": "https://github.com/VeriBlock/vbk-ri-stratum-pool.git/issues"
     },
     "license": "GPL-2.0",
     "author": "Matthew Little",
@@ -28,10 +32,11 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/zone117x/node-open-mining-portal.git"
+        "url": "https://github.com/VeriBlock/vbk-ri-stratum-pool.git.git",
+        "directory": "packages/portal"
     },
     "dependencies": {
-        "stratum-pool": "git://github.com/zone117x/node-stratum-pool.git",
+        "@veriblock/pop-stratum-pool": "*",
         "dateformat": "1.0.12",
         "node-json-minify": "*",
         "redis": "0.12.1",

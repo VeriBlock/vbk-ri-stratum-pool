@@ -1,8 +1,13 @@
 {
-    "name": "stratum-pool",
-    "version": "0.1.9",
+    "name": "@veriblock/pop-stratum-pool",
+	"private": true,
+	"version": "0.1.0",
     "description": "High performance Stratum poolserver in Node.js",
+    "scripts": {
+        "build" : "echo ok"
+    },
     "keywords": [
+        "pop",
         "stratum",
         "mining",
         "pool",
@@ -12,9 +17,9 @@
         "litecoin",
         "scrypt"
     ],
-    "homepage": "https://github.com/zone117x/node-stratum-pool",
+    "homepage": "https://github.com/VeriBlock/vbk-ri-stratum-pool",
     "bugs": {
-        "url": "https://github.com/zone117x/node-stratum-pool/issues"
+        "url": "https://github.com/VeriBlock/vbk-ri-stratum-pool/issues"
     },
     "license": "GPL-2.0",
     "author": "Matthew Little",
@@ -25,10 +30,10 @@
     "main": "lib/index.js",
     "repository": {
         "type": "git",
-        "url": "https://github.com/zone117x/node-stratum-pool.git"
+        "url": "https://github.com/VeriBlock/vbk-ri-stratum-pool.git"
     },
     "dependencies": {
-        "multi-hashing": "git://github.com/zone117x/node-multi-hashing.git",
+        "@veriblock/pop-hashing": "0.1.0",
         "bignum": "0.13.1",
         "base58-native": "*",
         "async": "*"

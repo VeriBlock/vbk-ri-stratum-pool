@@ -1,7 +1,10 @@
 {
-  "name": "root",
+  "name": "@veriblock/pop-stratum",
   "private": true,
   "devDependencies": {
     "lerna": "^3.22.1"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

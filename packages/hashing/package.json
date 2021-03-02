@@ -1,0 +1,43 @@
+{
+    "name": "@veriblock/pop-hashing",
+    "private": true,
+    "version": "0.1.0",
+    "main": "multihashing",
+    "author": {
+        "name": "Matthew Little",
+        "email": "zone117x@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/zone117x/node-multi-hashing.git",
+        "directory": "packages/hashing"
+    },
+    "scripts": {
+        "build": "node-gyp rebuild",
+        "test": "mocha --require babel-register --gc-global tests/test.vectors.js"
+    },
+    "dependencies": {
+        "bindings": "*",
+        "nan": "^2.14.1"
+    },
+    "keywords": [
+        "argon2",
+        "scrypt",
+        "scryptjane",
+        "script-n",
+        "x11",
+        "quark",
+        "keccak_hash",
+        "skein",
+        "bcrypt",
+        "keccak",
+        "blake",
+        "shavite",
+        "fugue",
+        "sha1"
+    ],
+    "devDependencies": {
+        "babel-register": "^6.26.0",
+        "mocha": "^7.1.1"
+    }
+}
