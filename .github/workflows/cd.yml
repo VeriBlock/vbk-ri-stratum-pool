@@ -35,3 +35,4 @@ jobs:
           echo "----"
           echo "${{ env. BRANCH }}-${{ env.GIT_HASH }}"
           echo "----"
+
