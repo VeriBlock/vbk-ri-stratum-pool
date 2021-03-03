@@ -33,7 +33,7 @@
         "url": "https://github.com/VeriBlock/vbk-ri-stratum-pool.git"
     },
     "dependencies": {
-        "@veriblock/pop-hashing": "*",
+        "@veriblock/pop-hashing": "0.1.0",
         "bignum": "0.13.1",
         "base58-native": "*",
         "async": "*",
