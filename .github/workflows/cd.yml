@@ -26,7 +26,7 @@ jobs:
           name: veriblock/pop-stratum
           username: ${{ secrets.PUBLIC_DOCKERHUB_USERNAME }}
           password: ${{ secrets.PUBLIC_DOCKERHUB_PASSWORD }}
-          dockerfile: ubuntu.Dockerfile
+          dockerfile: Dockerfile
           tags: "${{ env. BRANCH }}-${{ env.GIT_HASH }}"
           snapshots: true
       - name: Show Tags
