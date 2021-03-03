@@ -27,7 +27,7 @@ jobs:
           username: ${{ secrets.PUBLIC_DOCKERHUB_USERNAME }}
           password: ${{ secrets.PUBLIC_DOCKERHUB_PASSWORD }}
           dockerfile: Dockerfile
-          tags: "${{ env. BRANCH }}-${{ env.GIT_HASH }}"
+          tags: "latest,${{ env. BRANCH }}-${{ env.GIT_HASH }}"
           snapshots: true
       - name: Show Tags
         run: |
