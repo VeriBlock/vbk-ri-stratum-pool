@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [15.x]
+        node-version: [13.x]
     env:
       CI: true
     steps:
@@ -27,3 +27,4 @@ jobs:
       - run: npm i -g lerna
       - run: lerna bootstrap
       - run: lerna run build
+      - run: lerna run test

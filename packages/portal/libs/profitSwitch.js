@@ -1,14 +1,14 @@
 var async  = require('async');
 var net    = require('net');
 var bignum = require('bignum');
-var algos  = require('stratum-pool/lib/algoProperties.js');
-var util   = require('stratum-pool/lib/util.js');
+var algos  = require('@veriblock/pop-stratum-pool/lib/algoProperties.js');
+var util   = require('@veriblock/pop-stratum-pool/lib/util.js');
 
 var Cryptsy  = require('./apiCryptsy.js');
 var Poloniex = require('./apiPoloniex.js');
 var Mintpal  = require('./apiMintpal.js');
 var Bittrex  = require('./apiBittrex.js');
-var Stratum  = require('stratum-pool');
+var Stratum  = require('@veriblock/pop-stratum-pool');
 
 module.exports = function(logger){
 
@@ -19,7 +19,7 @@ module.exports = function(logger){
 
     var logSystem = 'Profit';
 
-    // 
+    //
     // build status tracker for collecting coin market information
     //
     var profitStatus = {};
@@ -44,7 +44,7 @@ module.exports = function(logger){
     });
 
 
-    // 
+    //
     // ensure we have something to switch
     //
     Object.keys(profitStatus).forEach(function(algo){
@@ -62,7 +62,7 @@ module.exports = function(logger){
     }
 
 
-    // 
+    //
     // setup APIs
     //
     var poloApi =  new Poloniex(
@@ -83,7 +83,7 @@ module.exports = function(logger){
         // 'API_SECRET'
     );
 
-    // 
+    //
     // market data collection from Poloniex
     //
     this.getProfitDataPoloniex = function(callback){
@@ -139,12 +139,12 @@ module.exports = function(logger){
                     var marketData = profitStatus[symbolToAlgorithmMap[symbol]][symbol].exchangeInfo['Poloniex'];
                     if (marketData.hasOwnProperty('BTC') && marketData['BTC'].bid > 0){
                         depthTasks.push(function(callback){
-                            _this.getMarketDepthFromPoloniex('BTC', symbol, marketData['BTC'].bid, callback) 
+                            _this.getMarketDepthFromPoloniex('BTC', symbol, marketData['BTC'].bid, callback)
                         });
                     }
                     if (marketData.hasOwnProperty('LTC') && marketData['LTC'].bid > 0){
                         depthTasks.push(function(callback){
-                            _this.getMarketDepthFromPoloniex('LTC', symbol, marketData['LTC'].bid, callback) 
+                            _this.getMarketDepthFromPoloniex('LTC', symbol, marketData['LTC'].bid, callback)
                         });
                     }
                 });
@@ -168,7 +168,7 @@ module.exports = function(logger){
             }
             callback(null);
         });
-        
+
     };
     this.getMarketDepthFromPoloniex = function(symbolA, symbolB, coinPrice, callback){
         poloApi.getOrderBook(symbolA, symbolB, function(err, data){
@@ -199,7 +199,7 @@ module.exports = function(logger){
         });
     };
 
-    
+
     this.getProfitDataCryptsy = function(callback){
         async.series([
             function(taskCallback){
@@ -285,7 +285,7 @@ module.exports = function(logger){
             }
             callback(null);
         });
-        
+
     };
 
 
@@ -339,12 +339,12 @@ module.exports = function(logger){
                     var marketData = profitStatus[symbolToAlgorithmMap[symbol]][symbol].exchangeInfo['Mintpal'];
                     if (marketData.hasOwnProperty('BTC') && marketData['BTC'].bid > 0){
                         depthTasks.push(function(callback){
-                            _this.getMarketDepthFromMintpal('BTC', symbol, marketData['BTC'].bid, callback) 
+                            _this.getMarketDepthFromMintpal('BTC', symbol, marketData['BTC'].bid, callback)
                         });
                     }
                     if (marketData.hasOwnProperty('LTC') && marketData['LTC'].bid > 0){
                         depthTasks.push(function(callback){
-                            _this.getMarketDepthFromMintpal('LTC', symbol, marketData['LTC'].bid, callback) 
+                            _this.getMarketDepthFromMintpal('LTC', symbol, marketData['LTC'].bid, callback)
                         });
                     }
                 });
@@ -451,12 +451,12 @@ module.exports = function(logger){
                     var marketData = profitStatus[symbolToAlgorithmMap[symbol]][symbol].exchangeInfo['Bittrex'];
                     if (marketData.hasOwnProperty('BTC') && marketData['BTC'].bid > 0){
                         depthTasks.push(function(callback){
-                            _this.getMarketDepthFromBittrex('BTC', symbol, marketData['BTC'].bid, callback) 
+                            _this.getMarketDepthFromBittrex('BTC', symbol, marketData['BTC'].bid, callback)
                         });
                     }
                     if (marketData.hasOwnProperty('LTC') && marketData['LTC'].bid > 0){
                         depthTasks.push(function(callback){
-                            _this.getMarketDepthFromBittrex('LTC', symbol, marketData['LTC'].bid, callback) 
+                            _this.getMarketDepthFromBittrex('LTC', symbol, marketData['LTC'].bid, callback)
                         });
                     }
                 });
@@ -649,7 +649,7 @@ module.exports = function(logger){
         profitabilityTasks.push(_this.getCoindDaemonInfo);
         profitabilityTasks.push(_this.getMiningRate);
 
-        // has to be series 
+        // has to be series
         async.series(profitabilityTasks, function(err){
             if (err){
                 logger.error(logSystem, 'Check', 'Error while checking profitability: ' + err);
@@ -657,7 +657,7 @@ module.exports = function(logger){
             }
             //
             // TODO offer support for a userConfigurable function for deciding on coin to override the default
-            // 
+            //
             _this.switchToMostProfitableCoins();
         });
     };

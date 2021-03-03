@@ -4,7 +4,7 @@
 	"version": "0.1.0",
     "description": "High performance Stratum poolserver in Node.js",
     "scripts": {
-        "build": "echo ok"
+        "start": "node index.js"
     },
     "keywords": [
         "pop",
@@ -33,7 +33,7 @@
         "url": "https://github.com/VeriBlock/vbk-ri-stratum-pool.git"
     },
     "dependencies": {
-        "@veriblock/pop-hashing": "0.1.0",
+        "@veriblock/pop-hashing": "*",
         "bignum": "0.13.1",
         "base58-native": "*",
         "async": "*",

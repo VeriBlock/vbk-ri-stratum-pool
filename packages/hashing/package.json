@@ -14,6 +14,7 @@
     },
     "scripts": {
         "build": "node-gyp rebuild",
+        "clean": "node-gyp clean",
         "test": "mocha --require babel-register --gc-global tests/test.vectors.js"
     },
     "dependencies": {

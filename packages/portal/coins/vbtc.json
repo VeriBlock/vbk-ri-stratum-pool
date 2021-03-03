@@ -1,0 +1,5 @@
+{
+    "name": "vBitcoin",
+    "symbol": "vBTC",
+    "algorithm": "sha256"
+}
