@@ -15,15 +15,15 @@
         "minimumPayment": 70,
         "daemon": {
             "host": "127.0.0.1",
-            "port": 19332,
+            "port": 18332,
             "user": "testuser",
             "password": "testpass"
         }
     },
 
     "ports": {
-        "3008": {
-            "diff": 8
+        "3333": {
+            "diff": 0.01
         },
         "3032": {
             "diff": 32,
@@ -43,7 +43,7 @@
     "daemons": [
         {
             "host": "127.0.0.1",
-            "port": 19332,
+            "port": 18332,
             "user": "testuser",
             "password": "testpass"
         }
@@ -52,7 +52,7 @@
     "p2p": {
         "enabled": true,
         "host": "127.0.0.1",
-        "port": 19333,
+        "port": 18333,
         "disableTransactions": true
     },
 

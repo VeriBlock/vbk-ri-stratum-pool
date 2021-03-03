@@ -1,0 +1,7 @@
+node_modules
+*.log
+build
+packages/pool/node_modules
+packages/hashing/node_modules
+packages/hashing/build
+packages/portal/node_modules

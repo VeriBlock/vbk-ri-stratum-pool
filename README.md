@@ -1,6 +1,6 @@
 # Reference Implementation of POP-enabled Stratum V1 pool
 
-To run pool locally:
+### To run pool locally:
 
 1. Make sure you use node V13 or lower.
     - use [nvm](https://github.com/nvm-sh/nvm#installation)
@@ -32,3 +32,30 @@ To run pool locally:
 7. Go to `packages/portal`
 8. `node init.js` will run pool daemon and website. Redis and Nodes must be started beforehand.
 
+### To run pool in docker:
+
+Use docker-compose:
+
+```docker
+version: '3'
+services:
+  pool:
+    image: veriblock/pop-stratum:latest
+    ports:
+      # stratum v1 port (defined in poolconfig.json)
+      - 3333:3333
+      # web (defined in config.json)
+      - 8080:8080
+    volumes:
+      # mount config.json (create manually beforehand)
+      - ./config.json:/opt/stratum/packages/portal/config.json:ro
+      # mount coin.json (create manually beforehand)
+      - ./coin.json:/opt/stratum/packages/portal/coins/coin.json:ro
+      # mount poolconfig.json (create manually beforehand)
+      - ./poolconfig.json:/opt/stratum/packages/portal/pool_configs/poolconfig.json:ro
+    depends_on:
+      - redis
+
+  redis:
+    image: redis
+```
