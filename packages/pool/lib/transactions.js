@@ -115,7 +115,6 @@ var Generation = exports.Generation = function Generation(rpcData, publicKey, ex
  */
 
 
-
 /*
 This function creates the generation transaction that accepts the reward for
 successfully mining a new block.
@@ -123,7 +122,7 @@ For some (probably outdated and incorrect) documentation about whats kinda going
 see: https://en.bitcoin.it/wiki/Protocol_specification#tx
  */
 
-var generateOutputTransactions = function(poolRecipient, recipients, rpcData){
+var generateOutputTransactions = function (poolRecipient, recipients, rpcData, popRewards = undefined) {
 
     var reward = rpcData.coinbasevalue;
     var rewardToPool = reward;
@@ -131,48 +130,47 @@ var generateOutputTransactions = function(poolRecipient, recipients, rpcData){
     var txOutputBuffers = [];
 
 
-
-/* Dash 12.1 */
-if (rpcData.masternode && rpcData.superblock) {
-    if (rpcData.masternode.payee) {
-        var payeeReward = 0;
-
-        payeeReward = rpcData.masternode.amount;
-        reward -= payeeReward;
-        rewardToPool -= payeeReward;
-
-        var payeeScript = util.addressToScript(rpcData.masternode.payee);
-        txOutputBuffers.push(Buffer.concat([
-            util.packInt64LE(payeeReward),
-            util.varIntBuffer(payeeScript.length),
-            payeeScript
-        ]));
-    } else if (rpcData.superblock.length > 0) {
-        for(var i in rpcData.superblock){
+    /* Dash 12.1 */
+    if (rpcData.masternode && rpcData.superblock) {
+        if (rpcData.masternode.payee) {
             var payeeReward = 0;
 
-            payeeReward = rpcData.superblock[i].amount;
+            payeeReward = rpcData.masternode.amount;
             reward -= payeeReward;
             rewardToPool -= payeeReward;
 
-            var payeeScript = util.addressToScript(rpcData.superblock[i].payee);
+            var payeeScript = util.addressToScript(rpcData.masternode.payee);
             txOutputBuffers.push(Buffer.concat([
                 util.packInt64LE(payeeReward),
                 util.varIntBuffer(payeeScript.length),
                 payeeScript
             ]));
+        } else if (rpcData.superblock.length > 0) {
+            for (var i in rpcData.superblock) {
+                var payeeReward = 0;
+
+                payeeReward = rpcData.superblock[i].amount;
+                reward -= payeeReward;
+                rewardToPool -= payeeReward;
+
+                var payeeScript = util.addressToScript(rpcData.superblock[i].payee);
+                txOutputBuffers.push(Buffer.concat([
+                    util.packInt64LE(payeeReward),
+                    util.varIntBuffer(payeeScript.length),
+                    payeeScript
+                ]));
+            }
         }
     }
-}
 
-if (rpcData.payee) {
-    var payeeReward = 0;
+    if (rpcData.payee) {
+        var payeeReward = 0;
 
-    if (rpcData.payee_amount) {
-        payeeReward = rpcData.payee_amount;
-    } else {
-        payeeReward = Math.ceil(reward / 5);
-    }
+        if (rpcData.payee_amount) {
+            payeeReward = rpcData.payee_amount;
+        } else {
+            payeeReward = Math.ceil(reward / 5);
+        }
 
         reward -= payeeReward;
         rewardToPool -= payeeReward;
@@ -186,8 +184,7 @@ if (rpcData.payee) {
     }
 
 
-
-    for (var i = 0; i < recipients.length; i++){
+    for (var i = 0; i < recipients.length; i++) {
         var recipientReward = Math.floor(recipients[i].percent * reward);
         rewardToPool -= recipientReward;
 
@@ -204,8 +201,19 @@ if (rpcData.payee) {
         util.varIntBuffer(poolRecipient.length),
         poolRecipient
     ]));
-    
-    if (rpcData.default_witness_commitment !== undefined){
+
+    // VeriBlock: insert Pop Rewards
+    if (popRewards !== undefined) {
+        popRewards.forEach((out) => {
+            txOutputBuffers.unshift(Buffer.concat([
+                util.packInt64LE(out.amount),
+                util.varIntBuffer(out.payoutInfo.length),
+                out.payoutInfo
+            ]))
+        })
+    }
+
+    if (rpcData.default_witness_commitment !== undefined) {
         witness_commitment = new Buffer(rpcData.default_witness_commitment, 'hex');
         txOutputBuffers.unshift(Buffer.concat([
             util.packInt64LE(0),
@@ -222,7 +230,7 @@ if (rpcData.payee) {
 };
 
 
-exports.CreateGeneration = function(rpcData, publicKey, extraNoncePlaceholder, reward, txMessages, recipients){
+exports.CreateGeneration = function (rpcData, publicKey, extraNoncePlaceholder, reward, txMessages, recipients, popRewards = undefined) {
 
     var txInputsCount = 1;
     var txOutputsCount = 1;
@@ -239,7 +247,7 @@ exports.CreateGeneration = function(rpcData, publicKey, extraNoncePlaceholder, r
 
     //For coins that support/require transaction comments
     var txComment = txMessages === true ?
-        util.serializeString('https://github.com/zone117x/node-stratum') :
+        util.serializeString('pop-stratum-pool') :
         new Buffer([]);
 
 
@@ -272,7 +280,12 @@ exports.CreateGeneration = function(rpcData, publicKey, extraNoncePlaceholder, r
      */
 
 
-    var outputTransactions = generateOutputTransactions(publicKey, recipients, rpcData);
+    var outputTransactions = generateOutputTransactions(
+        publicKey,
+        recipients,
+        rpcData,
+        popRewards
+    );
 
     var p2 = Buffer.concat([
         scriptSigPart2,
@@ -281,7 +294,7 @@ exports.CreateGeneration = function(rpcData, publicKey, extraNoncePlaceholder, r
 
         //transaction output
         outputTransactions,
-        //end transaction ouput
+        //end transaction output
 
         util.packUInt32LE(txLockTime),
         txComment

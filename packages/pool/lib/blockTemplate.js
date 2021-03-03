@@ -3,6 +3,7 @@ var bignum = require('bignum');
 var merkleTree = require('./merkleTree.js');
 var transactions = require('./transactions.js');
 var util = require('./util.js');
+var pop = require('./pop')
 
 
 /**
@@ -65,13 +66,26 @@ var BlockTemplate = module.exports = function BlockTemplate(jobId, rpcData, pool
     }));
     this.merkleTree = new merkleTree(getTransactionBuffers(rpcData.transactions));
     this.merkleBranch = getMerkleHashes(this.merkleTree.steps);
+
+    // VeriBlock: get pop-related fields
+    if(pop.parsePopFields(this, rpcData)) {
+        // POP is supported.
+        // add two new merkle branches.
+        this.merkleTree.steps.push(this.popDataRoot)
+        this.merkleTree.steps.push(this.popContextInfoHash)
+        this.merkleBranch.push(this.popDataRoot.toString('hex'))
+        this.merkleBranch.push(this.popContextInfoHash.toString('hex'))
+    }
+
     this.generationTransaction = transactions.CreateGeneration(
         rpcData,
         poolAddressScript,
         extraNoncePlaceholder,
         reward,
         txMessages,
-        recipients
+        recipients,
+        this.popSupported ?
+            this.popRewards : undefined
     );
 
     this.serializeCoinbase = function(extraNonce1, extraNonce2){
@@ -100,18 +114,25 @@ var BlockTemplate = module.exports = function BlockTemplate(jobId, rpcData, pool
     };
 
     this.serializeBlock = function(header, coinbase){
-        return Buffer.concat([
+        var list = [
             header,
 
             util.varIntBuffer(this.rpcData.transactions.length + 1),
             coinbase,
             this.transactionData,
 
-            getVoteData(),
+            // getVoteData(),
+            //
+            // //POS coins require a zero byte appended to block which the daemon replaces with the signature
+            // new Buffer(reward === 'POS' ? [0] : [])
+        ]
 
-            //POS coins require a zero byte appended to block which the daemon replaces with the signature
-            new Buffer(reward === 'POS' ? [0] : [])
-        ]);
+        if(this.popSupported) {
+            var encoded = pop.encodePopData(this.popData)
+            list.push(encoded)
+        }
+
+        return Buffer.concat(list);
     };
 
     this.registerSubmit = function(extraNonce1, extraNonce2, nTime, nonce){

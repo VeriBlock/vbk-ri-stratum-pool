@@ -69,7 +69,7 @@ var pool = Stratum.createPool({
        optional and will only be used for the ports you configure it for. */
     "ports": {
         "3032": { //A port for your miners to connect to
-            "diff": 1, //the pool difficulty for this port
+            "diff": 0.01, //the pool difficulty for this port
 
             /* Variable difficulty is a feature that will automatically adjust difficulty for
                individual miners based on their hashrate in order to lower networking overhead */
@@ -95,7 +95,7 @@ var pool = Stratum.createPool({
             "host": "127.0.0.1",
             "port": 18332,
             "user": "vbitcoin",
-            "password": "4bUozw4wg5mK"
+            "password": "vbitcoin"
         }
     ],
 
