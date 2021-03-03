@@ -36,7 +36,7 @@
 
 Use docker-compose:
 
-```docker
+```yml
 version: '3'
 services:
   pool:
