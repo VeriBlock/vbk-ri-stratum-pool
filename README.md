@@ -59,3 +59,15 @@ services:
   redis:
     image: redis
 ```
+
+
+### Test with cpuminer
+
+1. Build https://github.com/pooler/cpuminer
+2. `./minerd -o 'stratum+tcp://localhost:3333' -u n4jSe18kZMCdGcZqaYprShXW6EH1wivUK1 -p x -a sha256d`
+
+Where:
+- `localhost:3333` is pool's host and port
+- `n4jSe18kZMCdGcZqaYprShXW6EH1wivUK1` is a legacy address (can be generated via `vbitcoin-cli getnewaddress "" legacy`)
+- `x` is password
+- `sha256d` is coin algorithm
