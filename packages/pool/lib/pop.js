@@ -13,9 +13,13 @@ var PopPayload = function (id, data) {
 
 var PopData = function (version, vbks, vtbs, atvs) {
     this.version = version;
-    this.vbks = vbks
-    this.vtbs = vtbs
-    this.atvs = atvs
+    this.vbks = vbks || []
+    this.vtbs = vtbs || []
+    this.atvs = atvs || []
+
+    this.empty = function() {
+        return this.vbks.length === 0 && this.vtbs.length === 0 && this.atvs.length === 0
+    }
 }
 
 const bigNumberRightShift = (b, bits) => {
@@ -109,11 +113,15 @@ var calculateContextInfoHash = function (height, ks1hex, ks2hex) {
     return util.sha256d(buf)
 }
 
+var POP_BIT = 0x80000
+
 var parsePopFields = function (object, gbt) {
     try {
         var height = parseField(gbt, 'height')
         var ks1 = parseField(gbt, 'pop_first_previous_keystone')
         var ks2 = parseField(gbt, 'pop_second_previous_keystone')
+        object.version = parseField(gbt, 'version')
+        object.height = height
         object.popContextInfoHash = calculateContextInfoHash(height, ks1, ks2)
         object.popDataRoot = Buffer.from(parseField(gbt, 'pop_data_root'), 'hex')
         object.popRewards = parseField(gbt, 'pop_rewards', (d) =>
@@ -124,7 +132,7 @@ var parsePopFields = function (object, gbt) {
 
         var parsePopPayloads = (x) => x.map((d) => new PopPayload(
             parseField(d, 'id'),
-            parseField(d, 'data')
+            parseField(d, 'serialized')
         ))
         object.popData = parseField(gbt, "pop_data", (x) => new PopData(
             parseField(x, 'version'),
@@ -132,18 +140,18 @@ var parsePopFields = function (object, gbt) {
             parseField(x, 'vtbs', parsePopPayloads),
             parseField(x, 'atvs', parsePopPayloads),
         ))
-        object.popSupported = true
     } catch (e) {
-        // pop is not supported if thrown
-        object.popSupported = false
+        console.error("Some POP fields are not available!")
+        return false
     }
 
-    return object.popSupported
+    return true
 }
 
 module.exports = {
     parsePopFields,
     encodePopData,
     PopData,
-    PopPayload
+    PopPayload,
+    POP_BIT
 }

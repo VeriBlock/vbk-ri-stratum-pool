@@ -54,7 +54,7 @@ var JobManager = module.exports = function JobManager(options){
     var jobCounter = new JobCounter();
 
     var shareMultiplier = algos[options.coin.algorithm].multiplier;
-    
+
     //public members
 
     this.extraNonceCounter = new ExtraNonceCounter(options.instanceId);
@@ -115,7 +115,8 @@ var JobManager = module.exports = function JobManager(options){
             _this.extraNoncePlaceholder,
             options.coin.reward,
             options.coin.txMessages,
-            options.recipients
+            options.recipients,
+            _this.popParams
         );
 
         _this.currentJob = tmpBlockTemplate;
@@ -150,7 +151,8 @@ var JobManager = module.exports = function JobManager(options){
             _this.extraNoncePlaceholder,
             options.coin.reward,
             options.coin.txMessages,
-            options.recipients
+            options.recipients,
+            _this.popParams
         );
 
         this.currentJob = tmpBlockTemplate;
@@ -228,7 +230,7 @@ var JobManager = module.exports = function JobManager(options){
         //Check if share is a block candidate (matched network difficulty)
         if (job.target.ge(headerBigNum)){
             blockHex = job.serializeBlock(headerBuffer, coinbaseBuffer).toString('hex');
-            if (options.coin.algorithm === 'blake' || options.coin.algorithm === 'neoscrypt') {                
+            if (options.coin.algorithm === 'blake' || options.coin.algorithm === 'neoscrypt') {
                 blockHash = util.reverseBuffer(util.sha256d(headerBuffer, nTime)).toString('hex');
             }
             else {
