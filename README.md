@@ -9,12 +9,12 @@
 3. `npx lerna bootstrap` - this will run `lerna bootstrap` command without installation, which is equal to `npm install` in each subpackage. If this fails, open issue in this repo with details.
 4. For new coin, create `packages/portal/coins/<name>.json`, for existing coin, skip this step.
 5. Create pool config:
-    1. Go to `packages/portal/pool_coins`
+    1. Go to `packages/portal/pool_configs`
     2. Copy `litecoin_example.json` and *rename* this file, we will use `vbtc_config.json`
     3. Inside `vbtc_config.json`:
          1. `enabled` - change to `true`
          2. `coin` - set to a filename from `coins` dir, for example `vbtc.json`
-         3. Set address and reward recipients (optional)
+         3. Set address (must be legacy) and reward recipients (optional)
          4. In `paymentProcessing` set daemon host, port, and creds.
          5. In `ports` section, each number is a new pool port. For simple deployments, leave single port.
             - if you're not sure what diffs are, set `diff` to 0.01 and remove `varDiff`
