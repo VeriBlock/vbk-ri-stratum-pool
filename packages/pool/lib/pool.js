@@ -158,19 +158,6 @@ var pool = module.exports = function pool(options, authorizeFn){
 
                 var percent = (blockCount / headerCount * 100).toFixed(2);
                 emitWarningLog('Downloaded ' + percent + '% (' + blockCount + '/' + headerCount + ') of blockchain');
-
-                // //get list of peers and their highest block height to compare to ours
-                // _this.daemon.cmd('getpeerinfo', [], function(results){
-
-                //     var peers = results[0].response;
-                //     var totalBlocks = peers.sort(function(a, b){
-                //         return b.startingheight - a.startingheight;
-                //     })[0].startingheight;
-
-                //     var percent = (blockCount / totalBlocks * 100).toFixed(2);
-                //     emitWarningLog('Downloaded ' + percent + '% of blockchain from ' + peers.length + ' peers');
-                // });
-
             });
         };
 
