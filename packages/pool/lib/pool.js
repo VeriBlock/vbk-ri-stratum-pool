@@ -152,18 +152,24 @@ var pool = module.exports = function pool(options, authorizeFn){
                 var blockCount = results.sort(function (a, b) {
                     return b.response.blocks - a.response.blocks;
                 })[0].response.blocks;
+                var headerCount = results.sort(function (a, b) {
+                    return b.response.headers - a.response.headers;
+                })[0].response.headers;
 
-                //get list of peers and their highest block height to compare to ours
-                _this.daemon.cmd('getpeerinfo', [], function(results){
+                var percent = (blockCount / headerCount * 100).toFixed(2);
+                emitWarningLog('Downloaded ' + percent + '% (' + blockCount + '/' + headerCount + ') of blockchain');
 
-                    var peers = results[0].response;
-                    var totalBlocks = peers.sort(function(a, b){
-                        return b.startingheight - a.startingheight;
-                    })[0].startingheight;
+                // //get list of peers and their highest block height to compare to ours
+                // _this.daemon.cmd('getpeerinfo', [], function(results){
 
-                    var percent = (blockCount / totalBlocks * 100).toFixed(2);
-                    emitWarningLog('Downloaded ' + percent + '% of blockchain from ' + peers.length + ' peers');
-                });
+                //     var peers = results[0].response;
+                //     var totalBlocks = peers.sort(function(a, b){
+                //         return b.startingheight - a.startingheight;
+                //     })[0].startingheight;
+
+                //     var percent = (blockCount / totalBlocks * 100).toFixed(2);
+                //     emitWarningLog('Downloaded ' + percent + '% of blockchain from ' + peers.length + ' peers');
+                // });
 
             });
         };
