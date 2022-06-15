@@ -1,0 +1,71 @@
+{
+    "enabled": true,
+    "coin": "btcsq.json",
+    "address": "14WjhVvbhWbibgQq8uQmhhFEBf5ea3h8Rq",
+    "rewardRecipients": {
+        "14WjhVvbhWbibgQq8uQmhhFEBf5ea3h8Rq": 1.0
+    },
+    "paymentProcessing": {
+        "enabled": true,
+        "paymentInterval": 21600,
+        "minimumPayment": 2,
+        "daemon": {
+            "host": "host.docker.internal",
+            "port": 8332,
+            "user": "username",
+            "password": "password"
+        }
+    },
+    "ports": {
+        "3030": {
+            "diff": 500000
+        },
+        "3256": {
+            "diff": 256,
+            "varDiff": {
+                "minDiff": 256,
+                "maxDiff": 2560,
+                "targetTime": 15,
+                "retargetTime": 90,
+                "variancePercent": 30
+            }
+        },
+        "3333": {
+            "diff": 0.01
+        },
+        "3032": {
+            "diff": 150000,
+            "varDiff": {
+                "minDiff": 135000,
+                "maxDiff": 512000,
+                "targetTime": 15,
+                "retargetTime": 90,
+                "variancePercent": 30
+            }
+        },
+        "3257": {
+            "diff": 38000,
+            "varDiff": {
+                "minDiff": 35000,
+                "maxDiff": 256000,
+                "targetTime": 15,
+                "retargetTime": 90,
+                "variancePercent": 30
+            }
+        }
+    },
+    "daemons": [
+        {
+            "host": "host.docker.internal",
+            "port": 8332,
+            "user": "username",
+            "password": "password"
+        }
+    ],
+    "p2p": {
+        "enabled": false,
+        "host": "host.docker.internal",
+        "port": 8333,
+        "disableTransactions": true
+    }
+}

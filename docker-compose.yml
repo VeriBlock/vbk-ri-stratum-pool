@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  pool:
+    image: veriblock/pop-stratum:latest
+    build: .
+    ports:
+      # Stratum V1 port (defined in poolconfig.json)
+      - 3333:3333
+      # web (defined in config.json)
+      - 8080:8080
+    volumes:
+      - ./config.json:/opt/stratum/packages/portal/config.json:ro
+      - ./coins/btcsq.json:/opt/stratum/packages/portal/coins/btcsq.json:ro
+      - ./pool_configs/poolconfig.json:/opt/stratum/packages/portal/pool_configs/poolconfig.json:ro
+    depends_on:
+      - redis
+
+  redis:
+    image: redis
